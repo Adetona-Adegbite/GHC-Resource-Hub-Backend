@@ -198,6 +198,20 @@ app.get("/files", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+// Search route
+app.get("/search", async (req, res) => {
+  const query = req.query.query.toLowerCase();
+  try {
+    const searchQuery = `
+      SELECT * FROM files
+      WHERE LOWER(title) ILIKE $1 OR LOWER(category) ILIKE $1
+    `;
+    const result = await pool.query(searchQuery, [`%${query}%`]);
+    res.status(200).json(result.rows);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 app.delete("/files/:id", async (req, res) => {
   const { id } = req.params;
