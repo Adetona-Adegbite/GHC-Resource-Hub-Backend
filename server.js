@@ -8,7 +8,6 @@ const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const path = require("path");
 const fs = require("fs");
-const { log } = require("console");
 require("dotenv").config();
 
 const app = express();
@@ -22,6 +21,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 // PostgreSQL connection
 const pool = new Pool({
   connectionString: process.env.DB_CONNECT_STRING,
+  port: 4040,
 });
 pool.connect((err) => {
   if (err) {
@@ -67,6 +67,7 @@ app.get("/init", async (req, res) => {
         user_id INT REFERENCES users(id),
         title VARCHAR(255) NOT NULL,
         category VARCHAR(255) NOT NULL,
+        division VARCHAR(255) NOT NULL,
         file_path VARCHAR(255) NOT NULL,
         cover_image_path VARCHAR(255),
         upload_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -152,7 +153,7 @@ app.post(
   ]),
   async (req, res) => {
     console.log("Upload Request Received");
-    const { title, userId, category } = req.body;
+    const { title, userId, category, division } = req.body;
     const pdfFile = req.files["pdf"];
     // console.log(req.file);
     const coverImage = req.files["coverImage"];
@@ -168,12 +169,13 @@ app.post(
 
     try {
       const query =
-        "INSERT INTO files (user_id, title, category, file_path, cover_image_path) VALUES ($1, $2, $3, $4, $5)";
+        "INSERT INTO files (user_id, title, category, division, file_path, cover_image_path) VALUES ($1, $2, $3, $4, $5)";
 
       await pool.query(query, [
         userId,
         title,
         category,
+        division,
         pdfFilePath,
         coverImagePath,
       ]);
