@@ -169,7 +169,7 @@ app.post(
 
     try {
       const query =
-        "INSERT INTO files (user_id, title, category, division, file_path, cover_image_path) VALUES ($1, $2, $3, $4, $5)";
+        "INSERT INTO files (user_id, title, category, division, file_path, cover_image_path) VALUES ($1, $2, $3, $4, $5, $6)";
 
       await pool.query(query, [
         userId,
